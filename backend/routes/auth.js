@@ -20,18 +20,33 @@ router.post("/register", async (req, res) => {
 // Inicio de sesión
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
+    console.log("Datos recibidos:", { email, password }); // Log de depuración
+
+    // 🔹 Verifica si la clave JWT_SECRET está cargada
+    console.log("JWT_SECRET en el login:", process.env.JWT_SECRET);
+
     try {
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ error: "Usuario no encontrado" });
+        if (!user) {
+            console.log("Usuario no encontrado"); // Log de depuración
+            return res.status(400).json({ error: "Usuario no encontrado" });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ error: "Contraseña incorrecta" });
+        if (!isMatch) {
+            console.log("Contraseña incorrecta"); // Log de depuración
+            return res.status(400).json({ error: "Contraseña incorrecta" });
+        }
 
+        // 🔹 Si JWT_SECRET es undefined, el token fallará
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        console.log("Token generado:", token); // Log de depuración
         res.json({ token });
     } catch (err) {
+        console.error("Error en la ruta de login:", err); // Log de depuración
         res.status(500).json({ error: "Error al iniciar sesión" });
     }
 });
+
 
 module.exports = router;

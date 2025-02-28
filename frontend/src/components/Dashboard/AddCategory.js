@@ -1,11 +1,11 @@
 import React, { useState, useContext } from "react";
 import api from "../../services/api";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext"; // Asegúrate de que AuthContext esté correctamente configurado
 
 const AddCategory = () => {
     const [name, setName] = useState("");
     const [error, setError] = useState("");
-    const { isAuthenticated } = useContext(AuthContext);
+    const { token, isAuthenticated } = useContext(AuthContext); // Obtén el token de AuthContext
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,12 +14,18 @@ const AddCategory = () => {
             return;
         }
         try {
-            const response = await api.post("/categories", { name });
-            console.log("Categoría agregada:", response.data);
-            // Limpiar el formulario o redirigir
-            setName("");
+            const response = await api.post(
+                "/categories", 
+                { name },
+                {
+                    headers: { Authorization: `Bearer ${token}` } // Asegúrate de pasar el token en los encabezados
+                }
+            );
+            console.log("Categoría agregada:", response.data); // Log de depuración
+            setName(""); // Limpiar el formulario
         } catch (err) {
             setError(err.response?.data?.error || "Error al agregar la categoría");
+            console.error("Error al agregar la categoría:", err); // Log de depuración
         }
     };
 

@@ -8,16 +8,18 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { login } = useContext(AuthContext); // Usar el contexto
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            console.log("Enviando datos al backend:", { email, password }); // Log de depuración
             const response = await api.post("/auth/login", { email, password });
-            console.log("Usuario logueado:", response.data);
+            console.log("Respuesta del backend:", response.data); // Log de depuración
             login(response.data.token); // Guardar el token y actualizar el estado de autenticación
             navigate("/dashboard"); // Redirigir al dashboard
         } catch (err) {
+            console.error("Error en la petición:", err); // Log de depuración
             setError(err.response?.data?.error || "Error al iniciar sesión");
         }
     };
